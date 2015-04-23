@@ -21,4 +21,4 @@
     - name: build it
       shell: export GOPATH=`pwd`/go && go build hello
     - name: run it :D
-      shell: screen -d -m ./hello start
+      shell: nohup sudo ./hello &
