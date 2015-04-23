@@ -1,0 +1,24 @@
+---
+- hosts: all
+  sudo: true
+  tasks:
+    - name: Update apt cache
+      apt: update_cache=yes
+    - name: Install golang
+      apt: name=golang state=present
+    - name: Install git
+      apt: name=git state=present
+    - name: get host_key for github
+      shell: ssh-keyscan github.com >> /etc/ssh/ssh_known_hosts
+    - name: put deployKey on host
+      copy: src=~/.ssh/id_rsa dest=/home/vagrant owner=vagrant group=vagrant mode=0644
+    - name: remove app
+      shell: rm -Rf go
+    - name: create directory structure
+      shell: mkdir go && cd go && mkdir src bin pkg && cd ..
+    - name: get app from github
+      git: repo=git@github.com:lucca65/go-ansible.git dest=/home/vagrant/go/src/hello key_file=id_rsa
+    - name: build it
+      shell: export GOPATH=`pwd`/go && go build hello
+    - name: run it :D
+      shell: screen -d -m ./hello start
