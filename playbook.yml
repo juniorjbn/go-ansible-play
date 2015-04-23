@@ -4,10 +4,13 @@
   tasks:
     - name: Update apt cache
       apt: update_cache=yes
+      tags: [apt]
     - name: Install golang
       apt: name=golang state=present
+      tags: [apt]
     - name: Install git
       apt: name=git state=present
+      tags: [apt]
     - name: get host_key for github
       shell: ssh-keyscan github.com >> /etc/ssh/ssh_known_hosts
     - name: put deployKey on host
