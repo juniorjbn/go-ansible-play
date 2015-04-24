@@ -1,10 +1,9 @@
 ---
 - hosts: servers
-  var_files:
-    - vars.yml
+  include_vars: vars.yml
   gather_facts: false
   sudo: true
-  sudo_user: {{ project_name }}
+  sudo_user: "{{ project_name }}"
 
   tasks:
   - name: Pull sources from repository

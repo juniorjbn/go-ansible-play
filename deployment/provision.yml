@@ -1,7 +1,6 @@
 ---
 - hosts: servers
-  var_files:
-    - vars.yml
+  include_vars: vars.yml
   gather_facts: false
   sudo: true
 
@@ -20,7 +19,7 @@
 
   - name: Install required system packages
     apt: pkg={{ item }} state=installed update-cache=yes
-    with_items: {{ system_packages }}
+    with_items: "{{ system_packages }}"
 
   - name: Mount code folder
     mount: fstype=vboxsf opts=uid={{ project_name }},gid={{ project_name }} name={{ project_root }}/code/ src={{ project_name }} state=mounted
@@ -52,8 +51,7 @@
 - include: deploy.yml
 
 - hosts: servers
-  var_files:
-    - vars.yml
+  include_vars: vars.yml
   gather_facts: false
   sudo: true
 
