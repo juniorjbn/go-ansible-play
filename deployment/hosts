@@ -1,0 +1,17 @@
+[remote:children]
+production
+staging
+
+[servers:children]
+production
+staging
+local
+
+[production]
+app.kiik.com nickname=production vm=0 branch=master
+
+[staging]
+app-staging.kiik.com nickname=staging vm=0 branch=develop
+
+[local]
+app.dev nickname=local vm=1 branch=develop

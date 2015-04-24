@@ -1,0 +1,7 @@
+---
+project_name: pci_wallet
+project_root: /var/kiik/pci_wallet
+project_repo: git@bitbucket.org:kiik_dev/pci_wallet.git
+system_packages:
+  - git
+  - golang

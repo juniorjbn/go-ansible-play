@@ -1,0 +1,63 @@
+---
+- hosts: servers
+  var_files:
+    - vars.yml
+  gather_facts: false
+  sudo: true
+
+  tasks:
+  - name: Create project directory
+    file: state=directory path={{ project_root }}
+
+  - name: Create user
+    user: home={{ project_root }}/home/ name={{ project_name }} state=present
+
+  - name: Update project directory
+    file: group={{ project_name }} owner={{ project_name }} mode=755 state=directory path={{ project_root }}
+
+  - name: Create code directory
+    file: group={{ project_name }} owner={{ project_name }} mode=755 state=directory path={{ project_root }}/root
+
+  - name: Install required system packages
+    apt: pkg={{ item }} state=installed update-cache=yes
+    with_items: {{ system_packages }}
+
+  - name: Mount code folder
+    mount: fstype=vboxsf opts=uid={{ project_name }},gid={{ project_name }} name={{ project_root }}/code/ src={{ project_name }} state=mounted
+    only_if: "$vm == 1"
+
+  - name: Create go project structure
+    file: group={{ project_name }} owner={{ project_name }} mode=755 state=directory path={{ project_root }}/pkg
+    file: group={{ project_name }} owner={{ project_name }} mode=755 state=directory path={{ project_root }}/bin
+    file: group={{ project_name }} owner={{ project_name }} mode=755 state=directory path={{ project_root }}/src
+
+  - name: Create the SSH directory
+    file: state=directory path={{ project_root }}/home/.ssh/
+    only_if: "$vm == 0"
+
+  - name: Upload SSH known hosts
+    copy: src=known_hosts dest={{ project_root }}/home/.ssh/known_hosts mode=0600
+    only_if: "$vm == 0"
+
+  - name: Upload SSH key.
+    copy: src=key dest={{ project_root }}/home/.ssh/id_rsa mode=0600
+    only_if: "$vm == 0"
+
+  - name: Change permissions
+    shell: chown -R {{ project_name }}:{{ project_name }} {{ project_root }}
+
+  handlers:
+    - include: handlers.yml
+
+- include: deploy.yml
+
+- hosts: servers
+  var_files:
+    - vars.yml
+  gather_facts: false
+  sudo: true
+
+  # tasks:
+  #   - name: Restart services
+  #     service: name={{ project_name }}_{{ item }} state=restared
+  #     with_items: {{ initfiles }}
